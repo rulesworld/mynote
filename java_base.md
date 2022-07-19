@@ -20,6 +20,42 @@
 
 ## HashMap
 
-- 初始化因子0.75,最小16，如果初始化达12个数目，则达到32，若一次性写人，可优化
+- 初始化因子0.75,最小容量16，如果初始化达12个数目，则达到32，若一次性写入，可优化因子
 
-- 
+- 最小容量16，并且Java7以后为懒初始化，避免内存消耗
+
+- 线程不安全
+
+- Java 8之前直接使用HashMap中的numberOfLeadingZeros方法计算初始化容量，之后使用Interger中的该方法，初始化容量会被计算为2的N次方
+
+- numberOfLeadingZeros方法,通过依次位运算取或，将进位最高的第一个1后的全部置0，去到大于传入初始化容量的最小的二次幂，该方法全部是位运算，计算机编译后可以高效执行
+
+```java
+    @HotSpotIntrinsicCandidate
+    public static int numberOfLeadingZeros(int i) {
+        // HD, Count leading 0's
+        if (i <= 0)
+            return i == 0 ? 32 : 0;
+        int n = 31;
+        if (i >= 1 << 16) { n -= 16; i >>>= 16; }
+        if (i >= 1 <<  8) { n -=  8; i >>>=  8; }
+        if (i >= 1 <<  4) { n -=  4; i >>>=  4; }
+        if (i >= 1 <<  2) { n -=  2; i >>>=  2; }
+        return n - (i >>> 1);
+    }
+```
+
+- Hashmap的hash方法被重写，会进行高8与低8位取或，进行hash扰动，减少hash碰撞
+
+## Java注释注解
+
+- 不存在@date注解
+
+- 符合Java Doc规范的常用注解
+
+```java
+/**
+ * @author zhanghong
+ * @since 
+ */
+```
